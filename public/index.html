@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Inviter Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #00d4aa;
+            --warning: #ff6b6b;
+            --info: #4ecdc4;
+            --dark-bg: #1a1a1a;
+            --dark-card: #2d2d2d;
+            --light-bg: #f5f7fa;
+            --light-card: #ffffff;
+            --text-dark: #1a1a1a;
+            --text-light: #ffffff;
+            --border-radius: 15px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: var(--text-light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--light-card);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .dark-mode .card {
+            background: var(--dark-card);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            color: white;
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .dark-mode input, .dark-mode textarea, .dark-mode select {
+            background: #3d3d3d;
+            color: white;
+            border-color: #555;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        button {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .dark-mode .progress-bar {
+            background: #3d3d3d;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .tabs {
+            display: flex;
+            background: #eee;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+        }
+
+        .dark-mode .tabs {
+            background: #3d3d3d;
+        }
+
+        .tab {
+            padding: 15px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 0 0 10px 10px;
+            min-height: 400px;
+        }
+
+        .dark-mode .tab-content {
+            background: var(--dark-card);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .log-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .dark-mode .log-container {
+            background: #2d2d2d;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dark-mode .log-entry {
+            border-bottom: 1px solid #444;
+        }
+
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        .info { color: blue; }
+
+        .dark-mode .success { color: lightgreen; }
+        .dark-mode .error { color: #ff6b6b; }
+        .dark-mode .warning { color: #ffd166; }
+        .dark-mode .info { color: #4ecdc4; }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--warning);
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    <div id="notification" class="notification"></div>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Meeting Details Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Meeting Details</h2>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="meeting-title"><i class="fas fa-pencil-alt"></i> Meeting Title</label>
+                        <input type="text" id="meeting-title" placeholder="Weekly Team Sync">
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting-date"><i class="fas fa-calendar-day"></i> Date</label>
+                        <input type="text" id="meeting-date" placeholder="25 Aug 2025">
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting-time"><i class="fas fa-clock"></i> Time</label>
+                        <input type="text" id="meeting-time" placeholder="2:00 PM IST">
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting-link"><i class="fas fa-link"></i> Meeting Link</label>
+                        <input type="text" id="meeting-link" placeholder="https://meet.google.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting-notes"><i class="fas fa-sticky-note"></i> Notes</label>
+                        <textarea id="meeting-notes">Looking forward to seeing everyone!</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="message-template"><i class="fas fa-envelope"></i> Message Template</label>
+                        <small>Use placeholders: {name}, {date}, {time}, {link}, {notes}</small>
+                        <textarea id="message-template">Hi {name}! 👋
+
+You're invited to our meeting on {date} at {time}.
+
+Join us here: {link}
+
+{notes}
+
+See you there!
+Best regards, The Team</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Channels Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-broadcast-tower"></i> Delivery Channels</h2>
+                </div>
+                <div class="card-content">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="use-email" checked>
+                        <label for="use-email"><i class="fas fa-envelope"></i> Email</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="use-whatsapp">
+                        <label for="use-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Data Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-database"></i> Contact Data</h2>
+                </div>
+                <div class="card-content">
+                    <p>Upload CSV or Excel with columns: Name, Email, Mobile</p>
+                    <input type="file" id="contact-file" accept=".csv,.xlsx,.xls">
+                    <div id="file-info" style="margin-top: 10px; font-size: 12px;"></div>
+                </div>
+            </div>
+
+            <!-- Launch Campaign Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-rocket"></i> Launch Campaign</h2>
+                </div>
+                <div class="card-content">
+                    <button id="send-btn"><i class="fas fa-paper-plane"></i> Send Invitations</button>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div id="status-text">Ready to send</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="tabs">
+                <div class="tab active" data-tab="contacts"><i class="fas fa-address-book"></i> Contacts</div>
+                <div class="tab" data-tab="email"><i class="fas fa-envelope"></i> Email Setup</div>
+                <div class="tab" data-tab="whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp Setup</div>
+                <div class="tab" data-tab="logs"><i class="fas fa-chart-bar"></i> Results & Logs</div>
+            </div>
+
+            <!-- Contacts Tab -->
+            <div class="tab-content active" id="contacts-tab">
+                <h2><i class="fas fa-address-book"></i> Contact Preview</h2>
+                <div id="contacts-preview">
+                    <p><i class="fas fa-info-circle"></i> Contact File Format</p>
+                    <p>Upload Excel/CSV with these columns (case-insensitive):</p>
+                    <p><i class="fas fa-user"></i> Name - Contact's full name</p>
+                    <p><i class="fas fa-envelope"></i> Email - For email invitations</p>
+                    <p><i class="fas fa-mobile-alt"></i> Mobile - For WhatsApp (international format)</p>
+                    <p>Example: 919876543210 (not +91-98765-43210)</p>
+                    <p>After loading your file, a preview will appear here.</p>
+                </div>
+            </div>
+
+            <!-- Email Tab -->
+            <div class="tab-content" id="email-tab">
+                <h2><i class="fas fa-envelope"></i> Email Configuration</h2>
+                <div class="form-group">
+                    <label for="email-provider">Email Provider</label>
+                    <select id="email-provider">
+                        <option value="Gmail">Gmail</option>
+                        <option value="Outlook">Outlook</option>
+                        <option value="Yahoo">Yahoo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="email-address">Your Email</label>
+                    <input type="email" id="email-address" placeholder="your.email@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label for="email-password">App Password</label>
+                    <input type="password" id="email-password" placeholder="16-character app password">
+                </div>
+                <div class="form-group">
+                    <label for="email-subject">Email Subject</label>
+                    <input type="text" id="email-subject" placeholder="Meeting Invitation">
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <h3><i class="fas fa-shield-alt"></i> Security Tips</h3>
+                        <p>• Gmail: Enable 2-Factor Auth → Generate App Password → Use here</p>
+                        <p>• Outlook: Usually works with regular password</p>
+                        <p>• Yahoo: Create App Password in Security settings</p>
+                        <p>• Never use your main account password!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WhatsApp Tab -->
+            <div class="tab-content" id="whatsapp-tab">
+                <h2><i class="fab fa-whatsapp"></i> WhatsApp Business API</h2>
+                <div class="form-group">
+                    <label for="wa-token">Access Token</label>
+                    <input type="password" id="wa-token" placeholder="EAAxxxxxxxxx...">
+                </div>
+                <div class="form-group">
+                    <label for="wa-phone-id">Phone Number ID</label>
+                    <input type="text" id="wa-phone-id" placeholder="123456789012345">
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <h3><i class="fas fa-cogs"></i> WhatsApp Business API Setup</h3>
+                        <p>• Create Meta Business Account at business.facebook.com</p>
+                        <p>• Add WhatsApp Business API to your app</p>
+                        <p>• Get Access Token from App Dashboard</p>
+                        <p>• Find Phone Number ID in WhatsApp Manager</p>
+                        <p>• Add test recipients for development mode</p>
+                        <p>• Only verified test numbers receive messages in dev mode</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Tab -->
+            <div class="tab-content" id="logs-tab">
+                <h2><i class="fas fa-chart-bar"></i> Campaign Results & Logs</h2>
+                <button id="export-btn" style="margin-bottom: 15px; width: auto;"><i class="fas fa-download"></i> Export CSV</button>
+                <div class="log-container" id="log-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const themeToggle = document.querySelector('.theme-toggle');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const contactFileInput = document.getElementById('contact-file');
+        const fileInfo = document.getElementById('file-info');
+        const contactsPreview = document.getElementById('contacts-preview');
+        const sendBtn = document.getElementById('send-btn');
+        const progressFill = document.getElementById('progress-fill');
+        const statusText = document.getElementById('status-text');
+        const logContainer = document.getElementById('log-container');
+        const exportBtn = document.getElementById('export-btn');
+        const notification = document.getElementById('notification');
+
+        // State
+        let contacts = [];
+        let results = [];
+        let isSending = false;
+        let uploadedFileName = '';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show correct content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}-tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // File upload handling
+            contactFileInput.addEventListener('change', handleFileUpload);
+
+            // Send button
+            sendBtn.addEventListener('click', startSending);
+
+            // Export button
+            exportBtn.addEventListener('click', exportResults);
+
+            // Check if we're in production
+            logMessage(`App initialized in ${window.location.hostname === 'localhost' ? 'development' : 'production'} mode`, 'info');
+        });
+
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            themeToggle.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+
+        // File upload handling
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            fileInfo.textContent = `Selected: ${file.name} (${formatFileSize(file.size)})`;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Show uploading status
+            fileInfo.textContent = `Uploading: ${file.name}...`;
+
+            // Send file to server
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    logMessage(`Upload error: ${data.error}`, 'error');
+                    fileInfo.textContent = `Error: ${data.error}`;
+                    showNotification(`Upload error: ${data.error}`, 'error');
+                    return;
+                }
+
+                uploadedFileName = data.filename;
+                fileInfo.textContent = `Uploaded: ${data.originalName}`;
+                showNotification('File uploaded successfully', 'success');
+                
+                // Process the uploaded file
+                return fetch('/api/email/process-contacts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ filename: data.filename })
+                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    contacts = data.contacts;
+                    displayContactsPreview(contacts);
+                    logMessage(`Successfully loaded ${contacts.length} contacts.`, 'success');
+                    showNotification(`Loaded ${contacts.length} contacts`, 'success');
+                } else {
+                    logMessage(`Error processing file: ${data.error}`, 'error');
+                    showNotification(`Error processing file: ${data.error}`, 'error');
+                }
+            })
+            .catch(error => {
+                logMessage(`Upload error: ${error.message}`, 'error');
+                fileInfo.textContent = `Upload failed: ${error.message}`;
+                showNotification(`Upload error: ${error.message}`, 'error');
+            });
+        }
+
+        function displayContactsPreview(contacts) {
+            if (contacts.length === 0) {
+                contactsPreview.innerHTML = '<p>No contacts to display.</p>';
+                return;
+            }
+            
+            // Show first 5 contacts as preview
+            let html = `<h3>Contact Preview (${contacts.length} total)</h3>`;
+            html += '<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">';
+            
+            // Table headers
+            const headers = Object.keys(contacts[0]);
+            html += '<tr>';
+            headers.forEach(header => {
+                html += `<th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">${header}</th>`;
+            });
+            html += '</tr>';
+            
+            // Table rows (first 5)
+            contacts.slice(0, 5).forEach(contact => {
+                html += '<tr>';
+                headers.forEach(header => {
+                    html += `<td style="padding: 8px; border-bottom: 1px solid #ddd;">${contact[header] || ''}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</table>';
+            
+            if (contacts.length > 5) {
+                html += `<p>... and ${contacts.length - 5} more contacts</p>`;
+            }
+            
+            contactsPreview.innerHTML = html;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function startSending() {
+            if (contacts.length === 0) {
+                logMessage('Please load a contact file first.', 'error');
+                showNotification('Please load a contact file first.', 'error');
+                return;
+            }
+            
+            const useEmail = document.getElementById('use-email').checked;
+            const useWhatsapp = document.getElementById('use-whatsapp').checked;
+            
+            if (!useEmail && !useWhatsapp) {
+                logMessage('Please select at least one delivery channel.', 'error');
+                showNotification('Please select at least one delivery channel.', 'error');
+                return;
+            }
+            
+            // Validate email settings if needed
+            if (useEmail) {
+                const email = document.getElementById('email-address').value;
+                const password = document.getElementById('email-password').value;
+                
+                if (!email || !password) {
+                    logMessage('Please configure your email settings.', 'error');
+                    showNotification('Please configure your email settings.', 'error');
+                    return;
+                }
+            }
+            
+            // Validate WhatsApp settings if needed
+            if (useWhatsapp) {
+                const token = document.getElementById('wa-token').value;
+                const phoneId = document.getElementById('wa-phone-id').value;
+                
+                if (!token || !phoneId) {
+                    logMessage('Please configure your WhatsApp settings.', 'error');
+                    showNotification('Please configure your WhatsApp settings.', 'error');
+                    return;
+                }
+            }
+            
+            // Get meeting details
+            const meetingDetails = {
+                title: document.getElementById('meeting-title').value,
+                date: document.getElementById('meeting-date').value,
+                time: document.getElementById('meeting-time').value,
+                link: document.getElementById('meeting-link').value,
+                notes: document.getElementById('meeting-notes').value,
+                template: document.getElementById('message-template').value
+            };
+            
+            // Get channel settings
+            const channelSettings = {
+                useEmail,
+                useWhatsapp,
+                emailProvider: document.getElementById('email-provider').value,
+                emailAddress: document.getElementById('email-address').value,
+                emailPassword: document.getElementById('email-password').value,
+                emailSubject: document.getElementById('email-subject').value || meetingDetails.title || 'Meeting Invitation',
+                waToken: document.getElementById('wa-token').value,
+                waPhoneId: document.getElementById('wa-phone-id').value
+            };
+            
+            // Confirmation
+            const channels = [];
+            if (useEmail) channels.push('Email');
+            if (useWhatsapp) channels.push('WhatsApp');
+            
+            const confirmMsg = `Ready to send invitations!\n\nContacts: ${contacts.length}\nChannels: ${channels.join(' & ')}\nMeeting: ${meetingDetails.date} at ${meetingDetails.time}\n\nContinue?`;
+            
+            if (!confirm(confirmMsg)) return;
+            
+            // Start sending
+            isSending = true;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Sending...';
+            progressFill.style.width = '0%';
+            statusText.textContent = 'Preparing to send...';
+            results = [];
+            logContainer.innerHTML = '';
+            
+            logMessage('🚀 Starting invitation campaign...', 'info');
+            logMessage(`📊 Total contacts: ${contacts.length}`, 'info');
+            logMessage(`📡 Channels: ${channels.join(' & ')}`, 'info');
+            logMessage('─'.repeat(50), 'info');
+            
+            // Process contacts
+            processContacts(contacts, meetingDetails, channelSettings);
+        }
+
+        function processContacts(contacts, meetingDetails, channelSettings) {
+            let processed = 0;
+            const total = contacts.length;
+            
+            const processNext = () => {
+                if (processed >= total || !isSending) {
+                    // Finished
+                    finishSending();
+                    return;
+                }
+                
+                const contact = contacts[processed];
+                processed++;
+                
+                // Update progress
+                const progress = (processed / total) * 100;
+                progressFill.style.width = `${progress}%`;
+                statusText.textContent = `Progress: ${processed}/${total}`;
+                
+                // Generate personalized message
+                const personalizedMsg = substitutePlaceholders(
+                    meetingDetails.template,
+                    contact,
+                    {
+                        date: meetingDetails.date,
+                        time: meetingDetails.time,
+                        link: meetingDetails.link,
+                        notes: meetingDetails.notes,
+                        title: meetingDetails.title
+                    }
+                );
+                
+                // Send via channels
+                const promises = [];
+                
+                // Email sending
+                if (channelSettings.useEmail) {
+                    const email = contact.Email || contact.email || '';
+                    if (email && validateEmail(email)) {
+                        promises.push(
+                            sendEmail(
+                                channelSettings.emailProvider,
+                                channelSettings.emailAddress,
+                                channelSettings.emailPassword,
+                                email,
+                                channelSettings.emailSubject,
+                                personalizedMsg,
+                                meetingDetails.link
+                            ).then(result => {
+                                return {
+                                    type: 'email',
+                                    success: result.success,
+                                    error: result.error,
+                                    contact: contact
+                                };
+                            })
+                        );
+                    } else {
+                        results.push({
+                            name: contact.Name || contact.name || 'Unknown',
+                            email: email,
+                            mobile: contact.Mobile || contact.mobile || contact.Phone || contact.phone || '',
+                            emailStatus: 'skipped',
+                            emailError: 'Invalid or missing email address',
+                            whatsappStatus: 'pending',
+                            timestamp: new Date().toLocaleString()
+                        });
+                        logMessage(`Skipped email for ${contact.Name || contact.name}: invalid email`, 'warning');
+                    }
+                }
+                
+                // WhatsApp sending
+                if (channelSettings.useWhatsapp) {
+                    const mobile = contact.Mobile || contact.mobile || contact.Phone || contact.phone || '';
+                    if (mobile && mobile.length >= 10) {
+                        // Clean mobile number
+                        const cleanMobile = mobile.replace(/\D/g, '');
+                        promises.push(
+                            sendWhatsApp(
+                                channelSettings.waToken,
+                                channelSettings.waPhoneId,
+                                cleanMobile,
+                                personalizedMsg
+                            ).then(result => {
+                                return {
+                                    type: 'whatsapp',
+                                    success: result.success,
+                                    error: result.error,
+                                    contact: contact
+                                };
+                            })
+                        );
+                    } else {
+                        results.push({
+                            name: contact.Name || contact.name || 'Unknown',
+                            email: contact.Email || contact.email || '',
+                            mobile: mobile,
+                            whatsappStatus: 'skipped',
+                            whatsappError: 'Invalid or missing mobile number',
+                            emailStatus: 'pending',
+                            timestamp: new Date().toLocaleString()
+                        });
+                        logMessage(`Skipped WhatsApp for ${contact.Name || contact.name}: invalid mobile`, 'warning');
+                    }
+                }
+                
+                // Wait for all promises to resolve
+                Promise.all(promises).then(results => {
+                    results.forEach(result => {
+                        if (result.type === 'email') {
+                            if (result.success) {
+                                logMessage(`Email sent to ${result.contact.Name || result.contact.name}`, 'success');
+                            } else {
+                                logMessage(`Email failed for ${result.contact.Name || result.contact.name}: ${result.error}`, 'error');
+                            }
+                        } else if (result.type === 'whatsapp') {
+                            if (result.success) {
+                                logMessage(`WhatsApp sent to ${result.contact.Name || result.contact.name}`, 'success');
+                            } else {
+                                logMessage(`WhatsApp failed for ${result.contact.Name || result.contact.name}: ${result.error}`, 'error');
+                            }
+                        }
+                    });
+                    
+                    // Process next contact
+                    setTimeout(processNext, 1000);
+                });
+            };
+            
+            // Start processing
+            processNext();
+        }
+
+        function substitutePlaceholders(template, contact, extra) {
+            const values = {
+                "name": contact.Name || contact.name || "Customer",
+                "email": contact.Email || contact.email || "",
+                "mobile": contact.Mobile || contact.mobile || contact.Phone || contact.phone || "",
+                ...extra
+            };
+            
+            let out = template;
+            for (const [k, v] of Object.entries(values)) {
+                out = out.replace(new RegExp(`{${k}}`, 'g'), v);
+            }
+            return out;
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function sendEmail(provider, senderEmail, senderPass, toEmail, subject, bodyText, link) {
+            return fetch('/api/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    provider,
+                    senderEmail,
+                    senderPass,
+                    toEmail,
+                    subject,
+                    bodyText,
+                    link
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                return data;
+            })
+            .catch(error => {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            });
+        }
+
+        function sendWhatsApp(accessToken, phoneNumberId, toNumber, textBody) {
+            return fetch('/api/whatsapp/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    accessToken,
+                    phoneNumberId,
+                    toNumber,
+                    textBody
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                return data;
+            })
+            .catch(error => {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            });
+        }
+
+        function finishSending() {
+            isSending = false;
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Invitations';
+            
+            const successCount = results.filter(r => 
+                r.emailStatus === 'success' || r.whatsappStatus === 'success'
+            ).length;
+            
+            logMessage('─'.repeat(50), 'info');
+            logMessage('🎉 Campaign completed!', 'success');
+            logMessage(`📊 Total processed: ${results.length}`, 'info');
+            logMessage(`✅ Successfully sent: ${successCount}`, 'success');
+            logMessage(`❌ Failed: ${results.length - successCount}`, 'error');
+            logMessage(`📈 Success rate: ${((successCount / results.length) * 100).toFixed(1)}%`, 'info');
+            
+            statusText.textContent = `Completed: ${successCount}/${results.length} sent`;
+            
+            if (successCount > 0) {
+                showNotification(`Successfully sent ${successCount} invitations!`, 'success');
+            } else {
+                showNotification('No invitations were sent successfully.', 'error');
+            }
+        }
+
+        function logMessage(message, type = 'info') {
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function exportResults() {
+            if (results.length === 0) {
+                showNotification('No campaign results to export yet.', 'error');
+                return;
+            }
+            
+            // Convert results to CSV
+            const headers = ['Name', 'Email', 'Mobile', 'Email Status', 'WhatsApp Status', 'Timestamp'];
+            const csvData = results.map(r => [
+                r.name,
+                r.email,
+                r.mobile,
+                r.emailStatus,
+                r.whatsappStatus,
+                r.timestamp
+            ]);
+            
+            let csvContent = "data:text/csv;charset=utf-8," + headers.join(',') + '\n';
+            csvData.forEach(row => {
+                csvContent += row.map(field => `"${field}"`).join(',') + '\n';
+            });
+            
+            // Create download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            link.setAttribute("download", `meeting_invitations_${timestamp}.csv`);
+            document.body.appendChild(link);
+            
+            // Trigger download
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Results exported successfully', 'success');
+        }
+    </script>
+</body>
+</html>
