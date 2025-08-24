@@ -37,8 +37,8 @@ router.post('/send', async (req, res) => {
       };
     }
 
-    // Create transporter
-    const transporter = nodemailer.createTransporter({
+    // Create transporter - FIXED: Use createTransport instead of createTransporter
+    const transporter = nodemailer.createTransport({
       ...transporterConfig,
       auth: {
         user: senderEmail,
@@ -119,6 +119,9 @@ router.post('/send', async (req, res) => {
       </html>
     `;
 
+    // Verify connection configuration
+    await transporter.verify();
+
     // Send email
     const info = await transporter.sendMail({
       from: senderEmail,
@@ -180,7 +183,11 @@ router.post('/process-contacts', (req, res) => {
     }
     
     // Clean up the file after processing
-    fs.unlinkSync(filePath);
+    try {
+      fs.unlinkSync(filePath);
+    } catch (unlinkError) {
+      console.warn('Could not delete file:', unlinkError.message);
+    }
     
     res.json({ success: true, contacts });
   } catch (error) {
