@@ -923,29 +923,40 @@ Best regards, The Team</textarea>
         }
 
         function sendWhatsApp(accessToken, phoneNumberId, toNumber, textBody) {
-            return fetch('/api/whatsapp/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    accessToken,
-                    phoneNumberId,
-                    toNumber,
-                    textBody
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                return data;
-            })
-            .catch(error => {
-                return {
-                    success: false,
-                    error: error.message
-                };
-            });
-        }
+  return fetch('/api/whatsapp/send', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      accessToken: accessToken.trim(),
+      phoneNumberId: phoneNumberId.trim(),
+      toNumber: toNumber.toString().replace(/\D/g, ''),
+      textBody: textBody
+    })
+  })
+  .then(async response => {
+    const data = await response.json();
+    
+    if (!response.ok) {
+      // Create a more detailed error message
+      let errorMessage = data.error || 'WhatsApp API error';
+      if (data.details) {
+        errorMessage += ` - ${JSON.stringify(data.details)}`;
+      }
+      throw new Error(errorMessage);
+    }
+    
+    return data;
+  })
+  .catch(error => {
+    console.error('WhatsApp fetch error:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  });
+}
 
         function finishSending() {
             isSending = false;
@@ -1022,4 +1033,5 @@ Best regards, The Team</textarea>
         }
     </script>
 </body>
+
 </html>
